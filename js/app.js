@@ -11,9 +11,6 @@ let gameState = {
     pointLimit: 12
 };
 
-// Controle de debounce para cliques rápidos
-let isProcessing = false;
-
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     loadGameState();
@@ -61,33 +58,25 @@ function updateDisplay() {
     document.getElementById('pointLimit').textContent = gameState.pointLimit;
 }
 
-// Debounce para prevenir cliques múltiplos
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+// Debounce para prevenir cliques múltiplos (removido - não usado mais)
+// function debounce(func, wait) { ... }
 
-// Adicionar pontos com proteção contra cliques rápidos
+// Adicionar pontos - SEM qualquer proteção
 function addScore(team, points) {
-    // Prevenir processamento múltiplo
-    if (isProcessing) return;
-    
-    isProcessing = true;
+    console.log(`Adicionando ${points} pontos para time ${team}`);
     
     // Feedback visual imediato
-    const button = event.target;
-    button.classList.add('clicking');
+    const button = event?.target;
+    if (button) {
+        button.classList.add('clicking');
+        setTimeout(() => {
+            button.classList.remove('clicking');
+        }, 100);
+    }
     
     // Vibração se disponível
     if (navigator.vibrate) {
-        navigator.vibrate(50);
+        navigator.vibrate(30);
     }
 
     if (team === 'A') {
@@ -109,17 +98,11 @@ function addScore(team, points) {
     saveGameState();
     updateDisplay();
     checkWinner();
-    
-    // Liberar processamento após um tempo
-    setTimeout(() => {
-        isProcessing = false;
-        button.classList.remove('clicking');
-    }, 300);
 }
 
-// Desfazer pontuação
+// Desfazer pontuação - SEM proteção
 function undoScore(team) {
-    if (isProcessing) return;
+    console.log(`Desfazendo pontuação do time ${team}`);
     
     if (team === 'A' && gameState.historyA.length > 0) {
         gameState.scoreA = gameState.historyA.pop();
