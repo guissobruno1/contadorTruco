@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Touch Mobile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        
+        .test-btn {
+            width: 100px;
+            height: 100px;
+            background: #ff6600;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 24px;
+            margin: 10px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        .counter {
+            font-size: 48px;
+            color: #00ff00;
+            margin: 20px 0;
+        }
+        
+        .log {
+            background: #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste de Touch Events</h1>
+    
+    <div class="counter" id="counter">0</div>
+    
+    <button class="test-btn" id="btn1">TESTE 1</button>
+    <button class="test-btn" id="btn2">TESTE 2</button>
+    <button class="test-btn" id="btn3">TESTE 3</button>
+    
+    <div class="log" id="log"></div>
+    
+    <button onclick="clearLog()" style="background: #666; color: white; padding: 10px; border: none;">LIMPAR LOG</button>
+
+    <script>
+        let count = 0;
+        let logDiv = document.getElementById('log');
+        let counterDiv = document.getElementById('counter');
+
+        function addLog(message) {
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>${time}: ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function increment() {
+            count++;
+            counterDiv.textContent = count;
+            addLog(`Contador: ${count}`);
+        }
+
+        function clearLog() {
+            logDiv.innerHTML = '';
+            count = 0;
+            counterDiv.textContent = '0';
+        }
+
+        // MÉTODO 1: onclick tradicional
+        document.getElementById('btn1').onclick = function() {
+            addLog('MÉTODO 1: onclick tradicional');
+            increment();
+        };
+
+        // MÉTODO 2: addEventListener click
+        document.getElementById('btn2').addEventListener('click', function() {
+            addLog('MÉTODO 2: addEventListener click');
+            increment();
+        });
+
+        // MÉTODO 3: touchstart + click
+        document.getElementById('btn3').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            addLog('MÉTODO 3: touchstart');
+            increment();
+        });
+
+        document.getElementById('btn3').addEventListener('click', function(e) {
+            e.preventDefault();
+            addLog('MÉTODO 3: click (backup)');
+            increment();
+        });
+
+        // Logs gerais
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('=== PÁGINA CARREGADA ===');
+            addLog('User Agent: ' + navigator.userAgent);
+            addLog('Touch support: ' + ('ontouchstart' in window));
+        });
+
+        // Detectar tipo de evento
+        document.addEventListener('touchstart', function() {
+            addLog('GLOBAL: touchstart detectado');
+        });
+
+        document.addEventListener('click', function() {
+            addLog('GLOBAL: click detectado');
+        });
+    </script>
+</body>
+</html>
