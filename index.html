@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Truco</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Contador de pontos para truco gaúcho - simples e prático">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Truco">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-152.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Time A -->
+        <div class="team team-left">
+            <div class="team-name" id="teamAName">TIME A</div>
+            <div class="score-display">
+                <div class="current-score" id="scoreA">00</div>
+                <div class="previous-score" id="prevScoreA">00</div>
+            </div>
+            <div class="buttons">
+                <button class="score-btn btn-1" onclick="addScore('A', 1)">+1</button>
+                <button class="score-btn btn-3" onclick="addScore('A', 3)">+3</button>
+                <button class="score-btn btn-4" onclick="addScore('A', 4)">+4</button>
+            </div>
+            <button class="action-btn" onclick="undoScore('A')">DESFAZER</button>
+        </div>
+
+        <!-- Centro -->
+        <div class="center">
+            <div class="center-title">TRUCO</div>
+            <div class="game-info">
+                <div>PARTIDA <span id="currentGame">1</span>/<span id="maxGames">3</span></div>
+                <div>ATÉ <span id="pointLimit">12</span> PONTOS</div>
+                <div style="margin-top: 10px;">
+                    <div>🏆 <span id="winsA">0</span> x <span id="winsB">0</span> 🏆</div>
+                </div>
+            </div>
+            <button class="action-btn" onclick="toggleSettings()" style="margin-bottom: 10px;">⚙️</button>
+            <button class="action-btn" onclick="resetGame()">RESET</button>
+        </div>
+
+        <!-- Time B -->
+        <div class="team team-right">
+            <div class="team-name" id="teamBName">TIME B</div>
+            <div class="score-display">
+                <div class="current-score" id="scoreB">00</div>
+                <div class="previous-score" id="prevScoreB">00</div>
+            </div>
+            <div class="buttons">
+                <button class="score-btn btn-4" onclick="addScore('B', 4)">+4</button>
+                <button class="score-btn btn-3" onclick="addScore('B', 3)">+3</button>
+                <button class="score-btn btn-1" onclick="addScore('B', 1)">+1</button>
+            </div>
+            <button class="action-btn" onclick="undoScore('B')">DESFAZER</button>
+        </div>
+    </div>
+
+    <!-- Configurações -->
+    <div class="settings" id="settings">
+        <h3>Configurações</h3>
+        <label>Pontos para ganhar:</label>
+        <select id="pointLimitSelect" onchange="updateSettings()">
+            <option value="12">12 pontos</option>
+            <option value="24">24 pontos</option>
+            <option value="30">30 pontos</option>
+        </select>
+        
+        <label>Melhor de:</label>
+        <select id="maxGamesSelect" onchange="updateSettings()">
+            <option value="1">1 partida</option>
+            <option value="3" selected>3 partidas</option>
+            <option value="5">5 partidas</option>
+        </select>
+        
+        <label>Nome Time A:</label>
+        <input type="text" id="teamAInput" placeholder="TIME A" onchange="updateTeamNames()">
+        
+        <label>Nome Time B:</label>
+        <input type="text" id="teamBInput" placeholder="TIME B" onchange="updateTeamNames()">
+        
+        <button class="action-btn" onclick="toggleSettings()">Fechar</button>
+    </div>
+
+    <!-- Tela de Vitória -->
+    <div class="winner" id="winner">
+        <h1 id="winnerText">TIME A GANHOU!</h1>
+        <div class="winner-score" id="winnerScore"></div>
+        <button class="action-btn winner-btn" onclick="newMatch()">NOVA PARTIDA</button>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
