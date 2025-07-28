@@ -63,7 +63,6 @@ function updateDisplay() {
 
 // Adicionar pontos - SEM qualquer proteção
 function addScore(team, points) {
-    alert(`Funcionou! Team: ${team}, Points: ${points}`);
     console.log(`Adicionando ${points} pontos para time ${team}`);
     
     // Feedback visual imediato
