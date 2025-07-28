@@ -11,6 +11,9 @@ let gameState = {
     pointLimit: 12
 };
 
+// Controle de debounce para cliques rápidos
+let isProcessing = false;
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     loadGameState();
@@ -22,6 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Wake lock failed:', err);
         });
     }
+    
+    // Prevenir zoom duplo toque no Safari
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
 });
 
 // Formatação do score
@@ -48,8 +61,30 @@ function updateDisplay() {
     document.getElementById('pointLimit').textContent = gameState.pointLimit;
 }
 
-// Adicionar pontos
+// Debounce para prevenir cliques múltiplos
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Adicionar pontos com proteção contra cliques rápidos
 function addScore(team, points) {
+    // Prevenir processamento múltiplo
+    if (isProcessing) return;
+    
+    isProcessing = true;
+    
+    // Feedback visual imediato
+    const button = event.target;
+    button.classList.add('clicking');
+    
     // Vibração se disponível
     if (navigator.vibrate) {
         navigator.vibrate(50);
@@ -74,10 +109,18 @@ function addScore(team, points) {
     saveGameState();
     updateDisplay();
     checkWinner();
+    
+    // Liberar processamento após um tempo
+    setTimeout(() => {
+        isProcessing = false;
+        button.classList.remove('clicking');
+    }, 300);
 }
 
 // Desfazer pontuação
 function undoScore(team) {
+    if (isProcessing) return;
+    
     if (team === 'A' && gameState.historyA.length > 0) {
         gameState.scoreA = gameState.historyA.pop();
     } else if (team === 'B' && gameState.historyB.length > 0) {
@@ -161,13 +204,17 @@ function newMatch() {
     updateDisplay();
 }
 
-// Reset partida atual
+// Reset partida atual - CORRIGIDO
 function resetGame() {
-    if (confirm('Resetar partida atual?')) {
+    if (confirm('Resetar tudo? (partida atual + vitórias)')) {
+        // Reset completo: partida atual E vitórias
         gameState.scoreA = 0;
         gameState.scoreB = 0;
         gameState.historyA = [];
         gameState.historyB = [];
+        gameState.winsA = 0;  // CORRIGIDO: resetar vitórias também
+        gameState.winsB = 0;  // CORRIGIDO: resetar vitórias também
+        gameState.currentGame = 1; // CORRIGIDO: voltar para partida 1
         
         saveGameState();
         updateDisplay();
@@ -185,6 +232,9 @@ function toggleSettings() {
         document.getElementById('maxGamesSelect').value = gameState.maxGames;
         document.getElementById('teamAInput').value = document.getElementById('teamAName').textContent;
         document.getElementById('teamBInput').value = document.getElementById('teamBName').textContent;
+        
+        // Scroll para o topo no Safari
+        settings.scrollTop = 0;
     }
 }
 
@@ -213,10 +263,15 @@ function saveGameState() {
     const dataToSave = {
         ...gameState,
         teamAName: document.getElementById('teamAName').textContent,
-        teamBName: document.getElementById('teamBName').textContent
+        teamBName: document.getElementById('teamBName').textContent,
+        timestamp: Date.now()
     };
     
-    localStorage.setItem('trucoGameState', JSON.stringify(dataToSave));
+    try {
+        localStorage.setItem('trucoGameState', JSON.stringify(dataToSave));
+    } catch (e) {
+        console.log('Erro ao salvar:', e);
+    }
 }
 
 // Carregar estado do localStorage
@@ -247,21 +302,28 @@ function loadGameState() {
             }
         } catch (e) {
             console.log('Erro ao carregar estado salvo:', e);
+            // Se der erro, usar estado padrão
+            resetToDefault();
         }
     }
 }
 
-// Prevenir zoom em toque duplo (iOS Safari)
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-    }
-    lastTouchEnd = now;
-}, false);
+// Reset para estado padrão
+function resetToDefault() {
+    gameState = {
+        scoreA: 0,
+        scoreB: 0,
+        historyA: [],
+        historyB: [],
+        winsA: 0,
+        winsB: 0,
+        currentGame: 1,
+        maxGames: 3,
+        pointLimit: 12
+    };
+}
 
-// Prevenir comportamentos indesejados
+// Prevenir comportamentos indesejados no Safari
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
@@ -269,3 +331,12 @@ document.addEventListener('contextmenu', function(e) {
 document.addEventListener('selectstart', function(e) {
     e.preventDefault();
 });
+
+// Prevenir scroll indevido
+document.addEventListener('touchmove', function(e) {
+    if (e.target.closest('.settings')) {
+        // Permitir scroll apenas nas configurações
+        return;
+    }
+    e.preventDefault();
+}, { passive: false });

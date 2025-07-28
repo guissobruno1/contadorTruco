@@ -9,15 +9,20 @@ body {
     background: #000000;
     color: white;
     height: 100vh;
+    height: 100dvh; /* Para Safari mobile */
     overflow: hidden;
     user-select: none;
     touch-action: manipulation;
+    -webkit-user-select: none; /* Safari */
+    -webkit-touch-callout: none; /* Safari */
 }
 
 .container {
     display: flex;
     height: 100vh;
+    height: 100dvh; /* Para Safari mobile */
     width: 100vw;
+    width: 100dvw; /* Para Safari mobile */
 }
 
 .team {
@@ -26,8 +31,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
     position: relative;
+    min-width: 0; /* Previne overflow */
 }
 
 .team-left {
@@ -41,7 +47,8 @@ body {
 }
 
 .center {
-    width: 200px;
+    width: 180px;
+    min-width: 180px;
     background: #2a2a2a;
     display: flex;
     flex-direction: column;
@@ -52,20 +59,21 @@ body {
 }
 
 .team-name {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     color: #ffd700;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-align: center;
 }
 
 .score-display {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .current-score {
-    font-size: 120px;
+    font-size: 90px;
     font-weight: bold;
     color: #ffd700;
     text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
@@ -73,7 +81,7 @@ body {
 }
 
 .previous-score {
-    font-size: 40px;
+    font-size: 32px;
     color: #cccccc;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     border-top: 2px solid #666;
@@ -93,28 +101,41 @@ body {
 
 .buttons {
     display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: 12px;
+    margin-bottom: 25px;
+    justify-content: center;
 }
 
 .score-btn {
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
     border: none;
-    border-radius: 15px;
-    font-size: 32px;
+    border-radius: 12px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.1s;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    /* Prevenir double-tap zoom no Safari */
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    /* Debounce para cliques rápidos */
+    pointer-events: auto;
 }
 
 .score-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .score-btn:active {
     transform: scale(0.95);
+    transition: all 0.05s;
+}
+
+/* Prevenir cliques múltiplos */
+.score-btn.clicking {
+    pointer-events: none;
 }
 
 .btn-1 {
@@ -133,47 +154,55 @@ body {
 }
 
 .action-btn {
-    padding: 12px 24px;
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
     background: linear-gradient(135deg, #6c757d, #495057);
     color: white;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
 }
 
 .action-btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .center-title {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: #ffd700;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .game-info {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     color: #fff;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 .settings {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.95);
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(0,0,0,0.98);
     border: 2px solid #ffd700;
     padding: 20px;
     border-radius: 10px;
     display: none;
     z-index: 100;
-    min-width: 250px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll no Safari */
 }
 
 .settings.show {
@@ -182,19 +211,23 @@ body {
 
 .settings h3 {
     color: #ffd700;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-align: center;
+    font-size: 18px;
 }
 
 .settings select, .settings input {
-    margin: 8px 0;
-    padding: 10px;
+    margin: 10px 0;
+    padding: 12px;
     border-radius: 5px;
     border: 1px solid #666;
     background: #333;
     color: white;
     width: 100%;
-    font-size: 14px;
+    font-size: 16px;
+    /* Prevenir zoom no Safari */
+    font-size: 16px;
+    -webkit-appearance: none;
 }
 
 .settings label {
@@ -203,6 +236,7 @@ body {
     margin-top: 15px;
     margin-bottom: 5px;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .winner {
@@ -210,7 +244,9 @@ body {
     top: 0;
     left: 0;
     width: 100vw;
+    width: 100dvw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(0,0,0,0.95);
     display: flex;
     flex-direction: column;
@@ -225,11 +261,12 @@ body {
 }
 
 .winner h1 {
-    font-size: 60px;
+    font-size: 48px;
     color: #ffd700;
     margin-bottom: 20px;
     text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
     text-align: center;
+    padding: 0 20px;
 }
 
 .winner-score {
@@ -239,60 +276,80 @@ body {
 }
 
 .winner-btn {
-    font-size: 20px;
+    font-size: 18px;
     padding: 15px 30px;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
+/* Responsividade específica para celulares */
+@media screen and (max-width: 768px) {
     .current-score {
-        font-size: 80px;
+        font-size: 70px;
     }
     
     .team-name {
-        font-size: 18px;
+        font-size: 16px;
+        margin-bottom: 20px;
     }
     
     .score-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+        width: 55px;
+        height: 55px;
+        font-size: 20px;
+        gap: 10px;
+    }
+    
+    .buttons {
+        gap: 8px;
     }
     
     .center {
-        width: 120px;
+        width: 140px;
+        min-width: 140px;
     }
     
     .center-title {
-        font-size: 20px;
+        font-size: 18px;
+    }
+    
+    .game-info {
+        font-size: 10px;
     }
     
     .winner h1 {
-        font-size: 36px;
+        font-size: 32px;
     }
     
-    .settings {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        min-width: auto;
+    .team {
+        padding: 10px;
     }
 }
 
-/* Orientação paisagem forçada */
-@media screen and (orientation: portrait) {
-    body::before {
-        content: "🔄 Vire o celular para o modo paisagem";
+/* Orientação paisagem - avisos menos intrusivos */
+@media screen and (orientation: portrait) and (max-height: 500px) {
+    .container::before {
+        content: "🔄 Melhor no modo paisagem";
         position: fixed;
-        top: 50%;
+        top: 10px;
         left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.9);
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
         color: #ffd700;
-        padding: 20px;
-        border-radius: 10px;
+        padding: 8px 16px;
+        border-radius: 20px;
         text-align: center;
         z-index: 9999;
-        font-size: 18px;
+        font-size: 12px;
+        pointer-events: none;
+    }
+}
+
+/* Específico para Safari - prevenir comportamentos estranhos */
+@supports (-webkit-touch-callout: none) {
+    .score-btn {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+        -webkit-text-size-adjust: none;
     }
 }
